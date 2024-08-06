@@ -11,7 +11,7 @@ function Header() {
           <Link to="/guides" className="px-3">Guides</Link>
           <Link to="/calculator" className="px-3">Calculator</Link>
           <Link to="/forum" className="px-3">Forum</Link>
-          <Link to="/blog" className="px-3">Blog</Link>
+          <Link to="/learn-more" className="px-3">Learn More</Link>
         </nav>
       </div>
     </header>

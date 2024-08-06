@@ -1,60 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { db } from '../firebase';
+import { collection, getDocs, addDoc, query, orderBy } from 'firebase/firestore';
 
 const initialThreads = [
   {
     id: 1,
     title: "French Press",
-    content: "Share your tips for brewing with a French Press.",
-    answers: []
+    content: "Share your tips for brewing with a French Press."
   },
   {
     id: 2,
     title: "Espresso",
-    content: "What are your favorite beans for making espresso?",
-    answers: []
+    content: "What are your favorite beans for making espresso?"
   },
   {
     id: 3,
     title: "Pour Over",
-    content: "What are your best practices for making a perfect pour over coffee?",
-    answers: []
+    content: "What are your best practices for making a perfect pour over coffee?"
   },
   {
     id: 4,
     title: "Aeropress",
-    content: "What is your go-to Aeropress recipe?",
-    answers: []
+    content: "What is your go-to Aeropress recipe?"
   },
   {
     id: 5,
     title: "Cold Brew",
-    content: "How do you make the best cold brew coffee?",
-    answers: []
+    content: "How do you make the best cold brew coffee?"
   },
   {
     id: 6,
     title: "Moka Pot",
-    content: "Share your tips for brewing coffee with a Moka Pot.",
-    answers: []
+    content: "Share your tips for brewing coffee with a Moka Pot."
   },
   {
     id: 7,
     title: "Add more suggestions for coffee types",
-    content: "What other types of coffee do you enjoy?",
-    answers: []
+    content: "What other types of coffee do you enjoy?"
   },
   {
     id: 8,
-    title: "Best coffee you have  ever had",
-    content: "What is the best coffee you have ever had?",
-    answers: []
+    title: "Best coffee you have had",
+    content: "What is the best coffee you have ever had?"
   },
 ];
 
 function Forum() {
   const [threads, setThreads] = useState(initialThreads);
+  const [answers, setAnswers] = useState({});
   const [newAnswers, setNewAnswers] = useState({});
+
+  useEffect(() => {
+    const fetchAnswers = async () => {
+      const answersCollection = collection(db, 'answers');
+      const answersSnapshot = await getDocs(query(answersCollection, orderBy('timestamp')));
+      const answersData = {};
+      answersSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (!answersData[data.threadId]) {
+          answersData[data.threadId] = [];
+        }
+        answersData[data.threadId].push(data.answer);
+      });
+      setAnswers(answersData);
+    };
+
+    fetchAnswers();
+  }, []);
 
   const handleAnswerChange = (e, threadId) => {
     setNewAnswers({
@@ -63,28 +76,35 @@ function Forum() {
     });
   };
 
-  const handleAnswerSubmit = (threadId) => {
+  const handleAnswerSubmit = async (threadId) => {
     if (!newAnswers[threadId] || newAnswers[threadId].trim() === "") {
       toast.error("Answer cannot be empty!");
       return;
     }
 
-    const updatedThreads = threads.map(thread => {
-      if (thread.id === threadId) {
-        return {
-          ...thread,
-          answers: [...thread.answers, newAnswers[threadId]]
-        };
-      }
-      return thread;
-    });
+    const answer = newAnswers[threadId];
 
-    setThreads(updatedThreads);
-    setNewAnswers({
-      ...newAnswers,
-      [threadId]: ""
-    });
-    toast.success("Your answer has been submitted!");
+    try {
+      await addDoc(collection(db, 'answers'), {
+        threadId,
+        answer,
+        timestamp: new Date()
+      });
+
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [threadId]: prevAnswers[threadId] ? [...prevAnswers[threadId], answer] : [answer]
+      }));
+
+      setNewAnswers({
+        ...newAnswers,
+        [threadId]: ""
+      });
+
+      toast.success("Your answer has been submitted!");
+    } catch (error) {
+      toast.error("Error submitting your answer. Please try again.");
+    }
   };
 
   return (
@@ -112,7 +132,7 @@ function Forum() {
             </div>
             <div className="mt-4">
               <h4 className="text-lg font-semibold mb-2">Answers:</h4>
-              {thread.answers.map((answer, index) => (
+              {answers[thread.id] && answers[thread.id].map((answer, index) => (
                 <p key={index} className="p-2 bg-gray-200 rounded mb-2">{answer}</p>
               ))}
             </div>

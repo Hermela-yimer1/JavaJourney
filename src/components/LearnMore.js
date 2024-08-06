@@ -1,6 +1,6 @@
 import React from 'react';
 
-const blogPosts = [
+const learnMorePosts = [
   {
     id: 1,
     title: "The History of Coffee",
@@ -16,12 +16,12 @@ const blogPosts = [
   // Add more posts here
 ];
 
-function Blog() {
+function LearnMore() {
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-4">Educational Blog</h2>
+      <h2 className="text-3xl font-bold mb-4">Learn More About Coffee</h2>
       <div className="grid gap-4 md:grid-cols-2">
-        {blogPosts.map((post) => (
+        {learnMorePosts.map((post) => (
           <div key={post.id} className="p-4 bg-gray-100 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
             <p>{post.content}</p>
@@ -42,4 +42,4 @@ function Blog() {
   );
 }
 
-export default Blog;
+export default LearnMore;

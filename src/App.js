@@ -4,7 +4,7 @@ import Home from './components/Home';
 import BrewingGuides from './components/BrewingGuides';
 import Calculator from './components/Calculator';
 import Forum from './components/Forum';
-import Blog from './components/Blog';
+import LearnMore from './components/LearnMore';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { ToastContainer } from 'react-toastify';
@@ -20,7 +20,7 @@ function App() {
           <Route path="/guides" element={<BrewingGuides />} />
           <Route path="/calculator" element={<Calculator />} />
           <Route path="/forum" element={<Forum />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route path="/learn-more" element={<LearnMore />} />
         </Routes>
       </div>
       <Footer />
